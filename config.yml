@@ -211,9 +211,9 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      RoleName: udacityS3BucketRole
+      # ManagedPolicyArns:
+      #   - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      # RoleName: udacityS3BucketRole
 
   # S3BucketsPolicy:
   #   Type: AWS::IAM::Policy
@@ -290,11 +290,9 @@ Resources:
           systemctl enable httpd
           systemctl start apache2.service
           cd /var/www/html      
-          aws s3 cp s3://udacity-demo-1/udacity.zip .
-          unzip -o udacity.zip
+          echo "It works!" > index.html
       ImageId: ami-036d46416a34a611c
-      
-      # IamInstanceProfile: !Ref InstanceProfile
+      KeyName: udacity
       SecurityGroups:
         - Ref: SecurityGroupWebServer
       InstanceType: t2.micro
