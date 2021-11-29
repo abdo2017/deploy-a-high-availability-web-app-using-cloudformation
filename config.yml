@@ -325,7 +325,8 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      SecurityGroups: !Ref SecurityGroupLoadBalancer
+      SecurityGroups:
+        - Ref: SecurityGroupLoadBalancer
       Subnets:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
@@ -335,8 +336,10 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref WebAppTargetGroup
-      LoadBalancerArn: !Ref LoadBalancer
+          TargetGroupArn: 
+            Ref: WebAppTargetGroup
+      LoadBalancerArn:
+        Ref: LoadBalancer
       Port: 80
       Protocol: HTTP
 
@@ -345,11 +348,12 @@ Resources:
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref WebAppTargetGroup
+          TargetGroupArn:
+            Ref: WebAppTargetGroup
       Conditions:
         - Field: path-pattern
           Values: [ / ]
-      ListenerArn: !Ref Listener
+      ListenerArn: !Ref 'Listener'
       Priority: 1
 
 Outputs:
