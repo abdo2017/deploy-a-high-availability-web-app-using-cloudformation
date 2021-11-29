@@ -1,12 +1,24 @@
 Parameters:
-  VpcCIDR:
-    Description: Please enter the IP range
-    Type: String
-    Default: 10.0.0.0/16
 
   EnvironmentName:
     Description: Project name for applied for the rest of the config
     Type: String
+
+  VpcCIDR:
+    Description: Please enter the IP range
+    Type: String
+    Default: 10.0.0.0/16
+  
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the Subnet
+    Type: String
+    Default: 10.0.0.0/24
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the Subnet
+    Type: String
+    Default: 10.0.1.0/24
+
 
   PrivateSubnet1CIDR:
     Description: Please enter the IP range (CIDR notation) for the Subnet
@@ -18,15 +30,7 @@ Parameters:
     Type: String
     Default: 10.0.3.0/24
 
-  PublicSubnet1CIDR:
-    Description: Please enter the IP range (CIDR notation) for the Subnet
-    Type: String
-    Default: 10.0.0.0/24
 
-  PublicSubnet2CIDR:
-    Description: Please enter the IP range (CIDR notation) for the Subnet
-    Type: String
-    Default: 10.0.1.0/24
 
 Resources:
   VPC:
@@ -37,6 +41,41 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref EnvironmentName
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)          
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -59,41 +98,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
-
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
-      CidrBlock: !Ref PublicSubnet1CIDR
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
-
-  PublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 1, !GetAZs '' ]
-      CidrBlock: !Ref PublicSubnet2CIDR
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
-
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: !Ref EnvironmentName
-
-  InternetGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
 
   NatGateway1EIP:
     Type: AWS::EC2::EIP
@@ -206,29 +210,30 @@ Resources:
               Service:
                 - ec2.amazonaws.com
             Action:
-              - sts:AssumeRole
-      Path: "/"
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      RoleName: udacityS3BucketRole
 
-  S3BucketsPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: S3BucketsPolicy
-      PolicyDocument:
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:List*
-              - s3:Get*
-            Resource: "*"
-      Roles:
-        - Ref: S3BucketRole
+  # S3BucketsPolicy:
+  #   Type: AWS::IAM::Policy
+  #   Properties:
+  #     PolicyName: S3BucketsPolicy
+  #     PolicyDocument:
+  #       Statement:
+  #         - Effect: Allow
+  #           Action:
+  #             - s3:List*
+  #             - s3:Get*
+  #           Resource: "*"
+  #     Roles:
+  #       - Ref: S3BucketRole
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      Path: "/"
       Roles:
-        - Ref: S3BucketRole
+        - !Ref S3BucketRole
 
   SecurityGroupLoadBalancer:
     Type: AWS::EC2::SecurityGroup
@@ -253,8 +258,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
+          FromPort: 8080
+          ToPort: 8080
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 22
@@ -266,12 +271,12 @@ Resources:
           ToPort: 65535
           CidrIp: 0.0.0.0/0
 
-  ProfileWithRolesForOurApp:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: "/"
-      Roles:
-        - Ref: S3BucketRole
+  # ProfileWithRolesForOurApp:
+  #   Type: AWS::IAM::InstanceProfile
+  #   Properties:
+  #     Path: "/"
+  #     Roles:
+  #       - Ref: S3BucketRole
 
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -287,9 +292,9 @@ Resources:
           cd /var/www/html      
           aws s3 cp s3://udacity-demo-1/udacity.zip .
           unzip -o udacity.zip
-      ImageId: ami-0142f6ace1c558c7d
-      IamInstanceProfile: !Ref InstanceProfile
-      AssociatePublicIpAddress: true
+      ImageId: ami-036d46416a34a611c
+      KeyName: udacity
+      # IamInstanceProfile: !Ref InstanceProfile
       SecurityGroups:
         - Ref: SecurityGroupWebServer
       InstanceType: t2.micro
@@ -306,7 +311,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 8
       HealthyThresholdCount: 2
-      Port: 80
+      Port: 8080
       Protocol: HTTP
       UnhealthyThresholdCount: 5
       VpcId: !Ref VPC
@@ -338,8 +343,8 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: 
-            Ref: WebAppTargetGroup
+          TargetGroupArn:
+           Ref: WebAppTargetGroup
       LoadBalancerArn:
         Ref: LoadBalancer
       Port: 80
@@ -350,8 +355,7 @@ Resources:
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn:
-            Ref: WebAppTargetGroup
+          TargetGroupArn: !Ref 'WebAppTargetGroup'
       Conditions:
         - Field: path-pattern
           Values: [ / ]
