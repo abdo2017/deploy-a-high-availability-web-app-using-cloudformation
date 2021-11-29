@@ -51,17 +51,13 @@ Resources:
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref PublicSubnet1CIDR
       MapPublicIpOnLaunch: true
@@ -72,9 +68,7 @@ Resources:
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       CidrBlock: !Ref PublicSubnet2CIDR
       MapPublicIpOnLaunch: true
@@ -85,9 +79,7 @@ Resources:
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref PrivateSubnet1CIDR
       MapPublicIpOnLaunch: false
@@ -98,9 +90,7 @@ Resources:
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       CidrBlock: !Ref PrivateSubnet2CIDR
       MapPublicIpOnLaunch: false
@@ -141,9 +131,7 @@ Resources:
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Public Route table
@@ -171,9 +159,7 @@ Resources:
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Route Table 1
@@ -194,9 +180,7 @@ Resources:
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Route Table 2
@@ -251,9 +235,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: setting up security group for load balancer
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -269,9 +251,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: security group for web server
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 8080
@@ -307,7 +287,7 @@ Resources:
           systemctl start apache2.service
           cd /var/www/html      
           echo "It works!" > index.html
-      ImageId: ami-036d46416a34a611c
+      ImageId: ami-083654bd07b5da81d
       KeyName: udacity
       SecurityGroups:
         - Ref: SecurityGroupWebServer
@@ -328,9 +308,7 @@ Resources:
       Port: 8080
       Protocol: HTTP
       UnhealthyThresholdCount: 5
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+      VpcId: !Ref VPC
 
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
