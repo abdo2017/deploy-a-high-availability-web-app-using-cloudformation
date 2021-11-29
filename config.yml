@@ -202,7 +202,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -210,7 +210,8 @@ Resources:
                 - "ec2.amazonaws.com"
             Action:
               - 'sts:AssumeRole'
-      Path: "/"
+            ManagedPolicyArns:
+              - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
   S3BucketsPolicy:
     Type: AWS::IAM::Policy
@@ -229,7 +230,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - Ref: "S3BucketRole"
+        - Ref: S3BucketRole
 
   SecurityGroupLoadBalancer:
     Type: AWS::EC2::SecurityGroup
@@ -257,22 +258,23 @@ Resources:
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
+
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
           ToPort: 65535
           CidrIp: 0.0.0.0/0
 
-  ProfileWithRolesForOurApp:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: "/"
-      Roles:
-        - Ref: S3BucketRole
 
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -285,10 +287,10 @@ Resources:
           apt-get install apache2 -y
           systemctl enable httpd
           systemctl start apache2.service
-          cd /var/www/html      
-          echo "It works!" > index.html
+          cd /var/www/html
       ImageId: ami-083654bd07b5da81d
       KeyName: udacity
+      IamInstanceProfile: !Ref InstanceProfile
       SecurityGroups:
         - Ref: SecurityGroupWebServer
       InstanceType: t2.micro
