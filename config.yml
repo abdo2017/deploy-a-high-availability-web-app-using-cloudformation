@@ -288,6 +288,7 @@ Resources:
           unzip -o udacity.zip
       ImageId: ami-0d718c3d715cec4a7
       IamInstanceProfile: !Ref InstanceProfile
+      AssociatePublicIpAddress: true
       SecurityGroups:
         - Ref: SecurityGroupWebServer
       InstanceType: t2.micro
