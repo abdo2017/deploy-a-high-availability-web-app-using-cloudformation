@@ -210,8 +210,6 @@ Resources:
                 - "ec2.amazonaws.com"
             Action:
               - 'sts:AssumeRole'
-            ManagedPolicyArns:
-              - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
   S3BucketsPolicy:
     Type: AWS::IAM::Policy
