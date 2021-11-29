@@ -3,4 +3,4 @@ aws cloudformation create-stack \
 --template-body file://$2 \
 --parameters file://$3 \
 --capabilities CAPABILITY_NAMED_IAM \
---region=us-east-2
+--region=us-west-2
