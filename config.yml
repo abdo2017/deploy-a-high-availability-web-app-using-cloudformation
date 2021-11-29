@@ -208,19 +208,23 @@ Resources:
           - Effect: Allow
             Principal:
               Service:
-                - "ec2.amazonaws.com"
+                - ec2.amazonaws.com
             Action:
               - 'sts:AssumeRole'
+
+      Path: /
 
   S3BucketsPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: "root"
+      PolicyName: 'root'
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: "Allow"
-            Action: "*"
+            Action:
+              - s3:Get*
+              - s3:List*
             Resource: "*"
       Roles:
         - Ref: "S3BucketRole"
@@ -228,6 +232,7 @@ Resources:
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
+      Path: "/"
       Roles:
         - Ref: S3BucketRole
 
@@ -287,6 +292,8 @@ Resources:
           systemctl enable httpd
           systemctl start apache2.service
           cd /var/www/html
+          aws s3 cp s3://udacity-demo-1/udacity.zip . 
+          unzip -o udacity.zip
       ImageId: ami-083654bd07b5da81d
       KeyName: udacity
       IamInstanceProfile: !Ref InstanceProfile
