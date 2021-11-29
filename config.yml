@@ -208,32 +208,29 @@ Resources:
           - Effect: Allow
             Principal:
               Service:
-                - ec2.amazonaws.com
+                - "ec2.amazonaws.com"
             Action:
               - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      RoleName: udacityS3BucketRole
+      Path: "/"
 
   S3BucketsPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: S3BucketsPolicy
+      PolicyName: "root"
       PolicyDocument:
+        Version: "2012-10-17"
         Statement:
-          - Effect: Allow
-            Action:
-              - s3:List*
-              - s3:Get*
+          - Effect: "Allow"
+            Action: "*"
             Resource: "*"
       Roles:
-        - Ref: S3BucketRole
+        - Ref: "S3BucketRole"
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - !Ref S3BucketRole
+        - Ref: "S3BucketRole"
 
   SecurityGroupLoadBalancer:
     Type: AWS::EC2::SecurityGroup
