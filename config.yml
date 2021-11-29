@@ -284,10 +284,9 @@ Resources:
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          printf "<b>it works!!</b>" >> index.html
+          echo "IT WORKS!" > index.html          
           aws s3 cp s3://udacity-demo-1/udacity.zip .
           unzip -o udacity.zip
-          systemctl restart apache2.service
       ImageId: ami-0d718c3d715cec4a7
       IamInstanceProfile: !Ref InstanceProfile
       AssociatePublicIpAddress: true
