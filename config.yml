@@ -211,23 +211,23 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      # ManagedPolicyArns:
-      #   - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      # RoleName: udacityS3BucketRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      RoleName: udacityS3BucketRole
 
-  # S3BucketsPolicy:
-  #   Type: AWS::IAM::Policy
-  #   Properties:
-  #     PolicyName: S3BucketsPolicy
-  #     PolicyDocument:
-  #       Statement:
-  #         - Effect: Allow
-  #           Action:
-  #             - s3:List*
-  #             - s3:Get*
-  #           Resource: "*"
-  #     Roles:
-  #       - Ref: S3BucketRole
+  S3BucketsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: S3BucketsPolicy
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:List*
+              - s3:Get*
+            Resource: "*"
+      Roles:
+        - Ref: S3BucketRole
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -271,12 +271,12 @@ Resources:
           ToPort: 65535
           CidrIp: 0.0.0.0/0
 
-  # ProfileWithRolesForOurApp:
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties:
-  #     Path: "/"
-  #     Roles:
-  #       - Ref: S3BucketRole
+  ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: S3BucketRole
 
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
