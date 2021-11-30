@@ -226,7 +226,7 @@ Resources:
               - s3:List*
             Resource: "*"
       Roles:
-        - Ref: "S3BucketRole"
+        - Ref: S3BucketRole
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -326,7 +326,7 @@ Resources:
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
       MinSize: '4'
-      MaxSize: '5'
+      MaxSize: '4'
       TargetGroupARNs:
         - Ref: WebAppTargetGroup
 
