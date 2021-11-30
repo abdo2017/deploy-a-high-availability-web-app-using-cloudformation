@@ -5,7 +5,5 @@ this is a project about builidng IaC in AWS using cloudformation by desiging a d
 
 links for EC2 instances:
 
-ec2-18-221-114-59.us-east-2.compute.amazonaws.com
-ec2-3-143-3-158.us-east-2.compute.amazonaws.com
-ec2-18-220-62-62.us-east-2.compute.amazonaws.com
-ec2-3-142-218-190.us-east-2.compute.amazonaws.com
+ec2-3-220-156-79.compute-1.amazonaws.com
+ec2-18-210-227-137.compute-1.amazonaws.com
